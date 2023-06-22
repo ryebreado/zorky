@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from . import rooms
 
 app = Flask(__name__)
 
@@ -6,6 +7,7 @@ app = Flask(__name__)
 def hello_world():
     return render_template("index.html", title="Hello")
 
-@app.route("/hello/<name>")
-def hello(name):
-    return "Hi " + name
+@app.route("/room/<name>")
+def displayRoom(name):
+    room = rooms.home[name]
+    return room.description
