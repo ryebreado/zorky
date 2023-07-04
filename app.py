@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, make_response, redirect, url_for
 from . import rooms
+from . import dungeon
 
 app = Flask(__name__)
 
@@ -30,3 +31,22 @@ def setname():
         resp.set_cookie('userName', name)
 
         return resp
+    
+@app.route("/chamber/<number>")
+def displayChamber(number):
+    mapString = dungeon.gameState.createMapString(dungeon.gameState.currentCoords, 2)
+    return render_template("chamber.html", 
+                           mapString = mapString,
+                           number=number)
+@app.route("/chamber/<number>/<direction>")
+def moveToChamber(number, direction):
+    if direction == "left":
+        newChamber = dungeon.gameState.moveLeft()
+    if direction == "right":
+        newChamber = dungeon.gameState.moveRight()
+    if direction == "up":
+        newChamber = dungeon.gameState.moveUp()
+    if direction == "down":
+        newChamber = dungeon.gameState.moveDown()
+    return redirect(f"/chamber/{newChamber.number}")
+
