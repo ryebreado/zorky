@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, make_response, redirect, url_for
-from . import rooms
 from . import dungeon
 
 app = Flask(__name__)
@@ -13,15 +12,6 @@ def home():
                            name=name)
 
 
-@app.route("/room/<name>")
-def displayRoom(name):
-    room = rooms.home[name]
-    return render_template("room.html", 
-                           description=room.description,
-                           paths=room.paths,
-                           title=name)
-
-
 @app.route('/setname', methods=['POST', 'GET'])
 def setname():
     if request.method == 'POST':
@@ -32,12 +22,6 @@ def setname():
 
         return resp
     
-@app.route("/chamber/<number>")
-def displayChamber(number):
-    mapString = dungeon.gameState.createMapString(dungeon.gameState.currentCoords, 2)
-    return render_template("chamber.html", 
-                           mapString = mapString,
-                           number=number)
 @app.route("/chamber/<number>/<direction>")
 def moveToChamber(number, direction):
     if direction == "left":
@@ -48,5 +32,21 @@ def moveToChamber(number, direction):
         newChamber = dungeon.gameState.moveUp()
     if direction == "down":
         newChamber = dungeon.gameState.moveDown()
-    return redirect(f"/chamber/{newChamber.number}")
+    return redirect(f"/game")
 
+@app.route("/chamber/<number>")
+def displayChamber(number):
+    mapString = dungeon.gameState.createMapString(dungeon.gameState.currentCoords, 2)
+    return render_template("chamber.html", 
+                           mapString = mapString,
+                           number=number)
+
+@app.route("/game")
+def game():
+    chamber = dungeon.gameState.dungeon.chambers[dungeon.gameState.currentCoords]
+    number = chamber.number
+    mapString = dungeon.gameState.createMapString(dungeon.gameState.currentCoords, 2)
+    return render_template("chamber.html", 
+                           mapString = mapString,
+                           chamber=chamber,
+                           number=number)

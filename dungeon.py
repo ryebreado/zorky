@@ -1,3 +1,5 @@
+from . import npc
+
 class Coordinates:
     def __init__(self, x, y):
         self.x = x
@@ -41,9 +43,10 @@ testCoordinates(Coordinates(5, 0), Coordinates(5, 0))
 
 
 class Chamber:
-    def __init__(self, coordinates, number):
+    def __init__(self, coordinates, number, npc=None):
         self.coordinates = coordinates
         self.number = number
+        self.npc = npc
 
     def __str__(self):
         return (f"chamber {self.number} at {self.coordinates}")
@@ -64,7 +67,8 @@ class Dungeon:
 
     def createChamber(self, coordinates):
         Dungeon.lastNumber += 1
-        chamber = Chamber(coordinates, Dungeon.lastNumber)
+        roomNpc = npc.NPC("warrior", 1, 1) if Dungeon.lastNumber == 1 else None
+        chamber = Chamber(coordinates, Dungeon.lastNumber, npc=roomNpc)
         self.chambers[coordinates] = chamber
         return chamber
 
@@ -91,6 +95,7 @@ class GameState:
     def __init__(self):
         self.dungeon = Dungeon()
         self.currentCoords = Coordinates(0, 0)
+        self.npcs = [npc.NPC("warrior", 15, 15), npc.NPC("alchhemist", 10, 7)]
 
     def moveLeft(self):
         chamber = self.dungeon.moveLeft(self.currentCoords)
@@ -126,14 +131,14 @@ class GameState:
         return result
 
     def createMapString(self, center, margin):
-        map = self.createMap(center, margin)
+        world = self.createMap(center, margin)
         mapString = ""
-        for row in map:
+        for row in world:
             for chamber in row:
                 if chamber:
                     mapString += f" {chamber.number:2} "
                 else:
-                    mapString += f"  x "
+                    mapString += "  x "
             mapString += "\n"
         return mapString
 
