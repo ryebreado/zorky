@@ -1,4 +1,5 @@
-from . import npc
+from . import npc 
+from random import randint
 
 class Coordinates:
     def __init__(self, x, y):
@@ -67,8 +68,7 @@ class Dungeon:
 
     def createChamber(self, coordinates):
         Dungeon.lastNumber += 1
-        roomNpc = npc.NPC("warrior", 1, 1) if Dungeon.lastNumber == 1 else None
-        chamber = Chamber(coordinates, Dungeon.lastNumber, npc=roomNpc)
+        chamber = Chamber(coordinates, Dungeon.lastNumber)
         self.chambers[coordinates] = chamber
         return chamber
 
@@ -95,27 +95,43 @@ class GameState:
     def __init__(self):
         self.dungeon = Dungeon()
         self.currentCoords = Coordinates(0, 0)
-        self.npcs = [npc.NPC("warrior", 15, 15), npc.NPC("alchhemist", 10, 7)]
+        self.npcs = [npc.NPC("warrior", 15, 15), npc.NPC("alchemist", 10, 7)]
+        self.activeNpcs = {}
 
     def moveLeft(self):
         chamber = self.dungeon.moveLeft(self.currentCoords)
-        self.currentCoords = chamber.coordinates
-        return chamber
+        self.move(chamber)
 
     def moveRight(self):
         chamber = self.dungeon.moveRight(self.currentCoords)
-        self.currentCoords = chamber.coordinates
-        return chamber
+        self.move(chamber)
 
     def moveUp(self):
         chamber = self.dungeon.moveUp(self.currentCoords)
-        self.currentCoords = chamber.coordinates
-        return chamber
+        self.move(chamber)
 
     def moveDown(self):
         chamber = self.dungeon.moveDown(self.currentCoords)
+        self.move(chamber)
+    
+    def move(self, chamber):
+        print(f"activeNpcs 2 {self.activeNpcs}")
         self.currentCoords = chamber.coordinates
+        if len(self.npcs) > len(self.activeNpcs):
+            x = randint(0, 10)
+            print(f"x = {x}")
+            if x > 5:
+                self.addNpc()    
         return chamber
+    
+    def addNpc(self):
+        for npc in self.npcs:
+            if npc.name in self.activeNpcs:
+                continue
+            self.activeNpcs[npc.name] = npc
+            break
+        print(f"activeNpcs {self.activeNpcs}")
+        return "hi"
 
     def createMap(self, center, margin):
         result = []
@@ -142,10 +158,4 @@ class GameState:
             mapString += "\n"
         return mapString
 
-
-gameState = GameState()
-gameState.moveLeft()
-gameState.moveUp()
-print(gameState.currentCoords)
-print(gameState.dungeon.chambers)
-print(gameState.createMapString(Coordinates(0, 0), 2))
+gameState = None

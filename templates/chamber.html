@@ -5,9 +5,10 @@
 </head>
 
 <body>
+    {% include 'navbar.html' %}
     <div class="mx-auto p-2">
         <div class="App">
-            chamber: {{ number }}, npc: {{ chamber.npc }}
+            chamber: {{ number }}
         </div>
         <pre>{{ mapString }}</pre>
 
@@ -19,9 +20,11 @@
                 <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
                     card's
                     content.</p>
-                <a href="/game" class="btn btn-primary">Begin!</a>
             </div>
         </div>
+        {% endif %}
+        {% if activeNpcs %}
+        {{activeNpcs}}
         {% endif %}
         <div>
             <div>

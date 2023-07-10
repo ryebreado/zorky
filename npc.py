@@ -5,4 +5,7 @@ class NPC:
         self.health = health
 
     def __str__(self):
+        return f"{self.name}: Strength: {self.strength}, Health: {self.health}"    
+
+    def __repr__(self):
         return f"{self.name}: Strength: {self.strength}, Health: {self.health}"
