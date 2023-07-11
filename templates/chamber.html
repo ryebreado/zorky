@@ -13,31 +13,55 @@
         <pre>{{ mapString }}</pre>
 
         {% if chamber.npc %}
-        <div class="card" style="width: 18rem;">
-            <img src="{{ url_for('static', filename=chamber.npc.name + '.png') }}" class="App-logo" alt="logo" />
-            <div class="card-body">
-                <h5 class="card-title">{{ chamber.npc.name }}</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card's
-                    content.</p>
-            </div>
-        </div>
+
         {% endif %}
         {% if activeNpcs %}
-        {{activeNpcs}}
-        {% endif %}
-        <div>
-            <div>
-                You can go:
-                <a href="/chamber/{{ number }}/left">left</a>,
-                <a href="/chamber/{{ number }}/right">right</a>,
-                <a href="/chamber/{{ number }}/up">up</a>,
-                <a href="/chamber/{{ number }}/down">down</a>
+        <div class="container">
+            <div class="row">
+                {% for name in activeNpcs %}
+                <div class="col-sm">
+
+                    <img src="{{ url_for('static', filename=name + '.png') }}" alt="{{ name }}" width="250" />
+
+                    <h5 class="card-title">{{ name }}</h5>
+                    <p class="card-text">{{ activeNpcs[name] }}</p>
+
+
+                </div>
+                {% endfor %}
             </div>
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-                integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
-                crossorigin="anonymous"></script>
         </div>
+
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-9">
+                <div class="container">
+                    <div class="row bg-success">
+                        <img src="{{ url_for('static', filename= 'roomplaceholder.jpeg') }}" alt="{{ name }}" />
+                    </div>
+                    <div class="row bg-danger">
+                        two
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 bg-danger">
+
+            </div>
+        </div>
+    </div>
+    <div>
+        Enter command:
+        <form action="/game" method="POST">
+            <p><input type='text' name='cm' /></p>
+            <p><input type='submit' value='Submit' /></p>
+        </form>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+            crossorigin="anonymous"></script>
+    </div>
 </body>
 
 </html>

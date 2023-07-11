@@ -22,28 +22,13 @@ def setname():
         resp.set_cookie('userName', name)
 
         return resp
-    
-@app.route("/chamber/<number>/<direction>")
-def moveToChamber(number, direction):
-    if direction == "left":
-        newChamber = dungeon.gameState.moveLeft()
-    if direction == "right":
-        newChamber = dungeon.gameState.moveRight()
-    if direction == "up":
-        newChamber = dungeon.gameState.moveUp()
-    if direction == "down":
-        newChamber = dungeon.gameState.moveDown()
-    return redirect(f"/game")
 
-@app.route("/chamber/<number>")
-def displayChamber(number):
-    mapString = dungeon.gameState.createMapString(dungeon.gameState.currentCoords, 2)
-    return render_template("chamber.html", 
-                           mapString = mapString,
-                           number=number)
-
-@app.route("/game")
+@app.route("/game", methods=['POST', 'GET'])
 def game():
+    if request.method == 'POST':
+        command = request.form['cm']
+        return runCommand(command)
+
     if not dungeon.gameState:
         return redirect("/")
     chamber = dungeon.gameState.dungeon.chambers[dungeon.gameState.currentCoords]
@@ -54,3 +39,15 @@ def game():
                            mapString = mapString,
                            chamber=chamber,
                            number=number)
+
+def runCommand(command):
+    command = command.lower()
+    if command == "west" or command == "w":
+        dungeon.gameState.moveLeft()
+    if command == "east" or command == "e":
+        dungeon.gameState.moveRight()
+    if command == "north" or command == "n":
+        dungeon.gameState.moveUp()
+    if command == "south" or command == "s":
+        dungeon.gameState.moveDown()
+    return redirect(f"/game")
