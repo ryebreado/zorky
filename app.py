@@ -38,7 +38,8 @@ def game():
                            activeNpcs = dungeon.gameState.activeNpcs,
                            mapString = mapString,
                            chamber=chamber,
-                           number=number)
+                           number=number,
+                           history = dungeon.gameState.history)
 
 def runCommand(command):
     command = command.lower()

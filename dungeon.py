@@ -1,4 +1,5 @@
-from . import npc 
+from . import npc
+from . import events
 from random import randint
 
 class Coordinates:
@@ -54,10 +55,17 @@ class Chamber:
 
     def __repr__(self):
         return (f"chamber {self.number} at {self.coordinates}")
+    
+class MoveToChamberEvent(events.Event):
+    """Event for moving to chambers"""
 
+    def __init__(self, direction: str, chamber: Chamber):
+        self.__direction = direction
+        self.chamber = chamber
 
-room = Chamber(Coordinates(1, 1), 5)
-print(room)
+    def description(self):
+        """returns description of event"""
+        return f"moved {self.__direction} to {self.chamber}."
 
 
 class Dungeon:
@@ -72,23 +80,24 @@ class Dungeon:
         self.chambers[coordinates] = chamber
         return chamber
 
-    def moveToChamber(self, newCoords):
+    def moveToChamber(self, newCoords) -> Chamber:
         if newCoords in self.chambers:
             return self.chambers[newCoords]
         else:
             return self.createChamber(newCoords)
 
-    def moveLeft(self, coordinates):
-        return self.moveToChamber(coordinates.left())
+    def moveLeft(self, coordinates) -> MoveToChamberEvent:
+        return MoveToChamberEvent("west", self.moveToChamber(coordinates.left()))
 
-    def moveRight(self, coordinates):
-        return self.moveToChamber(coordinates.right())
+    def moveRight(self, coordinates) -> MoveToChamberEvent:
+        return MoveToChamberEvent("east", self.moveToChamber(coordinates.right()))
 
-    def moveUp(self, coordinates):
-        return self.moveToChamber(coordinates.up())
+    def moveUp(self, coordinates) -> MoveToChamberEvent:
+        return MoveToChamberEvent("north", self.moveToChamber(coordinates.up()))
 
-    def moveDown(self, coordinates):
-        return self.moveToChamber(coordinates.down())
+    def moveDown(self, coordinates) -> MoveToChamberEvent:
+        return MoveToChamberEvent("south", self.moveToChamber(coordinates.down()))
+    
 
 
 class GameState:
@@ -97,24 +106,27 @@ class GameState:
         self.currentCoords = Coordinates(0, 0)
         self.npcs = [npc.NPC("warrior", 15, 15), npc.NPC("alchemist", 10, 7)]
         self.activeNpcs = {}
+        self.history = events.History()
 
     def moveLeft(self):
-        chamber = self.dungeon.moveLeft(self.currentCoords)
-        self.move(chamber)
+        event = self.dungeon.moveLeft(self.currentCoords)
+        self.move(event)
 
     def moveRight(self):
-        chamber = self.dungeon.moveRight(self.currentCoords)
-        self.move(chamber)
+        event = self.dungeon.moveRight(self.currentCoords)
+        self.move(event)
 
     def moveUp(self):
-        chamber = self.dungeon.moveUp(self.currentCoords)
-        self.move(chamber)
+        event = self.dungeon.moveUp(self.currentCoords)
+        self.move(event)
 
     def moveDown(self):
-        chamber = self.dungeon.moveDown(self.currentCoords)
-        self.move(chamber)
+        event = self.dungeon.moveDown(self.currentCoords)
+        self.move(event)
     
-    def move(self, chamber):
+    def move(self, event: MoveToChamberEvent):
+        self.history.add_event(event)
+        chamber = event.chamber
         print(f"activeNpcs 2 {self.activeNpcs}")
         self.currentCoords = chamber.coordinates
         if len(self.npcs) > len(self.activeNpcs):
@@ -157,5 +169,7 @@ class GameState:
                     mapString += "  x "
             mapString += "\n"
         return mapString
+    
+    
 
 gameState = None

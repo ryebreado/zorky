@@ -10,7 +10,6 @@
         <div class="App">
             chamber: {{ number }}
         </div>
-        <pre>{{ mapString }}</pre>
 
         {% if chamber.npc %}
 
@@ -42,22 +41,30 @@
                     <div class="row bg-success">
                         <img src="{{ url_for('static', filename= 'roomplaceholder.jpeg') }}" alt="{{ name }}" />
                     </div>
-                    <div class="row bg-danger">
-                        two
+                    <div class="row bg-danger p-2">
+                        <div class="container">
+                            {% for event in history.most_recent_events(5) %}
+                            <div class="row">
+                                {{ event.description() }}
+                            </div>
+                            {%endfor%}
+                        </div>
+                    </div>
+                    <div class="row bg-success p-2">
+                        Enter command:
+                        <form action="/game" method="POST">
+                            <p><input type='text' name='cm' /></p>
+                            <p><input type='submit' value='Submit' /></p>
+                        </form>
                     </div>
                 </div>
             </div>
             <div class="col-3 bg-danger">
-
+                <pre>{{ mapString }}</pre>
             </div>
         </div>
     </div>
     <div>
-        Enter command:
-        <form action="/game" method="POST">
-            <p><input type='text' name='cm' /></p>
-            <p><input type='submit' value='Submit' /></p>
-        </form>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
             crossorigin="anonymous"></script>
