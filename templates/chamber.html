@@ -45,10 +45,17 @@
                         <div class="container">
                             {% for event in history.most_recent_events(5) %}
                             <div class="row">
-                                {{ event.description() }}
+                                {% for line in event.description() %}
+                                {{ line }}
+                            </br>
+                                {% endfor %}
+                            </div>
+                            <div class="row">
+                                &nbsp;
                             </div>
                             {%endfor%}
                         </div>
+                        
                     </div>
                     <div class="row bg-success p-2">
                         Enter command:

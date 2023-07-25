@@ -1,9 +1,9 @@
 """This is the module for history and events of the game"""
 
 class Event:
-    def description(self):
+    def description(self) -> list[str]:
         """Description of the Event"""
-        return "Undefined Event"
+        return ["Undefined Event"]
     
 class History:
     """History of Past Events"""

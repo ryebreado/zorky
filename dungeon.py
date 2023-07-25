@@ -63,9 +63,19 @@ class MoveToChamberEvent(events.Event):
         self.__direction = direction
         self.chamber = chamber
 
-    def description(self):
+    def description(self) -> list[str]:
         """returns description of event"""
-        return f"moved {self.__direction} to {self.chamber}."
+        return [f"moved {self.__direction} to {self.chamber}."]
+
+class MeetNpcEvent(events.Event):
+    """Event for meeting an NPC for the first time"""
+
+    def __init__(self, new_npc: npc.NPC):
+        self.npc = new_npc
+
+    def description(self) -> list[str]:
+        """returns description of event"""
+        return [f"Met new NPC {self.npc.name()}!", f"{self.npc.name().upper()}: {self.npc.greeting()}"]
 
 
 class Dungeon:
@@ -104,7 +114,7 @@ class GameState:
     def __init__(self):
         self.dungeon = Dungeon()
         self.currentCoords = Coordinates(0, 0)
-        self.npcs = [npc.NPC("warrior", 15, 15), npc.NPC("alchemist", 10, 7)]
+        self.npcs = [npc.Warrior(15, 15), npc.Alchemist(10, 7)]
         self.activeNpcs = {}
         self.history = events.History()
 
@@ -137,10 +147,11 @@ class GameState:
         return chamber
     
     def addNpc(self):
-        for npc in self.npcs:
-            if npc.name in self.activeNpcs:
+        for current_npc in self.npcs:
+            if current_npc.name() in self.activeNpcs:
                 continue
-            self.activeNpcs[npc.name] = npc
+            self.activeNpcs[current_npc.name()] = current_npc
+            self.history.add_event(MeetNpcEvent(current_npc))
             break
         print(f"activeNpcs {self.activeNpcs}")
         return "hi"
