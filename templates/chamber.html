@@ -7,47 +7,17 @@
 <body>
     {% include 'navbar.html' %}
     <div class="mx-auto p-2">
-        <div class="App">
-            chamber: {{ number }}
-        </div>
-
-        {% if chamber.npc %}
-
-        {% endif %}
-        {% if activeNpcs %}
         <div class="container">
             <div class="row">
-                {% for name in activeNpcs %}
-                <div class="col-sm">
-
-                    <img src="{{ url_for('static', filename=name + '.png') }}" alt="{{ name }}" width="250" />
-
-                    <h5 class="card-title">{{ name }}</h5>
-                    <p class="card-text">{{ activeNpcs[name] }}</p>
-
-
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-    </div>
-    {% endif %}
-
-    <div class="container">
-        <div class="row">
-            <div class="col-9">
-                <div class="container">
-                    <div class="row bg-success">
-                        <img src="{{ url_for('static', filename= 'roomplaceholder.jpeg') }}" alt="{{ name }}" />
-                    </div>
+                <div class="col-7">
+                    {% include "roomimg.html" %}
                     <div class="row bg-danger p-2">
                         <div class="container">
                             {% for event in history.most_recent_events(5) %}
                             <div class="row">
                                 {% for line in event.description() %}
                                 {{ line }}
-                            </br>
+                                </br>
                                 {% endfor %}
                             </div>
                             <div class="row">
@@ -55,7 +25,7 @@
                             </div>
                             {%endfor%}
                         </div>
-                        
+
                     </div>
                     <div class="row bg-success p-2">
                         Enter command:
@@ -65,9 +35,9 @@
                         </form>
                     </div>
                 </div>
-            </div>
-            <div class="col-3 bg-danger">
-                <pre>{{ mapString }}</pre>
+                <div class="col-3 bg-danger">
+                    <pre>{{ mapString }}</pre>
+                </div>
             </div>
         </div>
     </div>

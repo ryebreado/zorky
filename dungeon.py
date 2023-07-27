@@ -1,5 +1,6 @@
 from . import npc
 from . import events
+from . import characters
 from random import randint
 
 class Coordinates:
@@ -108,7 +109,10 @@ class Dungeon:
     def moveDown(self, coordinates) -> MoveToChamberEvent:
         return MoveToChamberEvent("south", self.moveToChamber(coordinates.down()))
     
-
+class Player(characters.Characters):
+    def name(self) -> str:
+        return "myself"
+    
 
 class GameState:
     def __init__(self):
@@ -117,6 +121,7 @@ class GameState:
         self.npcs = [npc.Warrior(15, 15), npc.Alchemist(10, 7)]
         self.activeNpcs = {}
         self.history = events.History()
+        self.myself = Player(10, 10)
 
     def moveLeft(self):
         event = self.dungeon.moveLeft(self.currentCoords)
