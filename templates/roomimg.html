@@ -20,6 +20,17 @@
                 </div>
             </div>
             {% endif %}
+
+            {% if chamber.monster %}
+            <div class="col-sm">
+
+                <img src="{{ url_for('static', filename=chamber.monster.image_name + '.png') }}" alt="{{ chamber.monster.name() }}"
+                    width="250" />
+
+                <h5 class="card-title">{{ chamber.monster.name() }}</h5>
+
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

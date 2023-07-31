@@ -36,7 +36,31 @@
                     </div>
                 </div>
                 <div class="col-3 bg-danger">
-                    <pre>{{ mapString }}</pre>
+                    <div class="container">
+                        <div class="row">
+                            <pre>{{ mapString }}</pre>
+                        </div>
+
+                        <div class="row">
+                            {{ myself }}
+                        </div>
+
+                        {% if chamber.monster %}
+                        <div class="row">
+                            {{ chamber.monster }}
+                        </div>
+                        {% endif %}
+
+                        {% if activeNpcs %}
+                                {% for name in activeNpcs %}
+                                <div class="row">
+
+                                    {{ activeNpcs[name] }}
+
+                                </div>
+                                {% endfor %}
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>

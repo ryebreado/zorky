@@ -39,6 +39,7 @@ def game():
                            mapString = mapString,
                            chamber=chamber,
                            number=number,
+                           myself=dungeon.gameState.myself,
                            history = dungeon.gameState.history)
 
 def runCommand(command):

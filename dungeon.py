@@ -46,10 +46,10 @@ testCoordinates(Coordinates(5, 0), Coordinates(5, 0))
 
 
 class Chamber:
-    def __init__(self, coordinates, number, npc=None):
+    def __init__(self, coordinates, number, monster: characters.Monster =None):
         self.coordinates = coordinates
         self.number = number
-        self.npc = npc
+        self.monster = monster
 
     def __str__(self):
         return (f"chamber {self.number} at {self.coordinates}")
@@ -78,6 +78,14 @@ class MeetNpcEvent(events.Event):
         """returns description of event"""
         return [f"Met new NPC {self.npc.name()}!", f"{self.npc.name().upper()}: {self.npc.greeting()}"]
 
+class MeetMonsterEvent(events.Event):
+    """Event for when you see a monster in a room"""
+    def __init__(self, new_monster: characters.Monster):
+        self.monster = new_monster
+    
+    def description(self) -> list[str]:
+        return [f"You see a {self.monster.name().lower()}.", 
+                f"{self.monster.name().upper()}: {self.monster.greeting()}"]
 
 class Dungeon:
     def __init__(self):
@@ -120,6 +128,7 @@ class GameState:
         self.currentCoords = Coordinates(0, 0)
         self.npcs = [npc.Warrior(15, 15), npc.Alchemist(10, 7)]
         self.activeNpcs = {}
+        self.monsters = [characters.Monster(5, 5, "Goblin", "pink-monster"), characters.Monster(15, 10, "Troll", "green-monster")]
         self.history = events.History()
         self.myself = Player(10, 10)
 
@@ -144,10 +153,17 @@ class GameState:
         chamber = event.chamber
         print(f"activeNpcs 2 {self.activeNpcs}")
         self.currentCoords = chamber.coordinates
-        if len(self.npcs) > len(self.activeNpcs):
-            x = randint(0, 10)
-            print(f"x = {x}")
-            if x > 5:
+        probability_empty = 1
+        probability_npc = 3
+        probability_monster = 3
+        total_probability = probability_empty + probability_npc + probability_monster
+        x = randint(0, total_probability)
+        if x <= probability_empty:
+            pass
+        elif x <= probability_empty + probability_monster:
+            chamber.monster = self.add_monster()
+        else:
+            if len(self.npcs) > len(self.activeNpcs):
                 self.addNpc()    
         return chamber
     
@@ -160,6 +176,21 @@ class GameState:
             break
         print(f"activeNpcs {self.activeNpcs}")
         return "hi"
+    
+    def add_monster(self):
+        prototype = self.monsters[randint(0, len(self.monsters) - 1)]
+        print(prototype.name())
+        print(prototype.image_name)
+        monster = characters.Monster(self.modify_stat(prototype.strength), 
+                                     self.modify_stat(prototype.health),
+                                     prototype.name(), prototype.image_name)
+        print(f"Created monster: {monster}")
+        self.history.add_event(MeetMonsterEvent(monster))
+
+        return monster
+    
+    def modify_stat(self, stat: int):
+        return randint(0.8 * stat, 1.2 * stat)
 
     def createMap(self, center, margin):
         result = []
