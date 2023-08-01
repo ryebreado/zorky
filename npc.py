@@ -1,7 +1,7 @@
 """Implementation of all NPCs"""
 from . import characters
 
-class NPC (characters.Characters):
+class NPC (characters.Character):
     """Base class for all NPCs: defines name, strength, and health"""
     
     def greeting(self) -> str:

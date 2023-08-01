@@ -3,6 +3,7 @@ from . import events
 from . import characters
 from random import randint
 
+
 class Coordinates:
     def __init__(self, x, y):
         self.x = x
@@ -46,7 +47,7 @@ testCoordinates(Coordinates(5, 0), Coordinates(5, 0))
 
 
 class Chamber:
-    def __init__(self, coordinates, number, monster: characters.Monster =None):
+    def __init__(self, coordinates, number, monster: characters.Monster = None):
         self.coordinates = coordinates
         self.number = number
         self.monster = monster
@@ -56,7 +57,8 @@ class Chamber:
 
     def __repr__(self):
         return (f"chamber {self.number} at {self.coordinates}")
-    
+
+
 class MoveToChamberEvent(events.Event):
     """Event for moving to chambers"""
 
@@ -68,6 +70,7 @@ class MoveToChamberEvent(events.Event):
         """returns description of event"""
         return [f"moved {self.__direction} to {self.chamber}."]
 
+
 class MeetNpcEvent(events.Event):
     """Event for meeting an NPC for the first time"""
 
@@ -78,14 +81,48 @@ class MeetNpcEvent(events.Event):
         """returns description of event"""
         return [f"Met new NPC {self.npc.name()}!", f"{self.npc.name().upper()}: {self.npc.greeting()}"]
 
+
 class MeetMonsterEvent(events.Event):
     """Event for when you see a monster in a room"""
+
     def __init__(self, new_monster: characters.Monster):
         self.monster = new_monster
-    
+
     def description(self) -> list[str]:
-        return [f"You see a {self.monster.name().lower()}.", 
+        return [f"You see a {self.monster.name().lower()}.",
                 f"{self.monster.name().upper()}: {self.monster.greeting()}"]
+
+
+class MonsterBlockEvent(events.Event):
+    """"Event for when you try to move without defeating monster"""
+
+    def description(self):
+        return ["The monster blocks your path!", "It doesnt look you can leave without defeating the monster."]
+    
+class NoTargetAttackEvent(events.Event):
+    """Event for when you attack with no target"""
+
+    def description(self):
+        return ["You attacked the air! You did 0 dmg D:"]
+    
+class AttackEvent(events.Event):
+    """Event for when you attack a monster"""
+    def __init__(self, attacker: characters.Character, target: characters.Character, dmg_taken: int):
+        self.attacker = attacker
+        self.target = target
+        self.dmg_taken = dmg_taken
+        
+    def description (self):
+        return [f"{self.attacker.name()} swung and hit {self.target.name()} for {self.dmg_taken} damage!"]
+
+class MonsterKilledEvent(events.Event):
+    "Event for when monster is killed (0 HP)"
+    def __init__(self, monster: characters.Monster):
+        self.monster = monster
+
+    def description(self):
+        return [f"{self.monster.name()} was defeated!"]
+
 
 class Dungeon:
     def __init__(self):
@@ -116,41 +153,56 @@ class Dungeon:
 
     def moveDown(self, coordinates) -> MoveToChamberEvent:
         return MoveToChamberEvent("south", self.moveToChamber(coordinates.down()))
-    
-class Player(characters.Characters):
+
+
+class Player(characters.Character):
     def name(self) -> str:
-        return "myself"
-    
+        return "Hero"
+
 
 class GameState:
     def __init__(self):
         self.dungeon = Dungeon()
         self.currentCoords = Coordinates(0, 0)
-        self.npcs = [npc.Warrior(15, 15), npc.Alchemist(10, 7)]
+        self.npcs = [npc.Warrior(4, 15), npc.Alchemist(2, 7)]
         self.activeNpcs = {}
-        self.monsters = [characters.Monster(5, 5, "Goblin", "pink-monster"), characters.Monster(15, 10, "Troll", "green-monster")]
+        self.monsters = [characters.Monster(
+            5, 5, "Goblin", "pink-monster"), characters.Monster(3, 20, "Troll", "green-monster")]
         self.history = events.History()
-        self.myself = Player(10, 10)
+        self.myself = Player(3, 10)
 
     def moveLeft(self):
-        event = self.dungeon.moveLeft(self.currentCoords)
-        self.move(event)
+        if self.move_allowed():
+            event = self.dungeon.moveLeft(self.currentCoords)
+            self.move(event)
 
     def moveRight(self):
-        event = self.dungeon.moveRight(self.currentCoords)
-        self.move(event)
+        if self.move_allowed():
+            event = self.dungeon.moveRight(self.currentCoords)
+            self.move(event)
 
     def moveUp(self):
-        event = self.dungeon.moveUp(self.currentCoords)
-        self.move(event)
+        if self.move_allowed():
+            event = self.dungeon.moveUp(self.currentCoords)
+            self.move(event)
 
     def moveDown(self):
-        event = self.dungeon.moveDown(self.currentCoords)
-        self.move(event)
+        if self.move_allowed():
+            event = self.dungeon.moveDown(self.currentCoords)
+            self.move(event)
+
+    def move_allowed(self) -> bool:
+        """Checks if we are allowed to move rooms"""
+        chamber = self.dungeon.chambers[self.currentCoords]
+        if chamber.monster:
+            self.history.add_event(MonsterBlockEvent())
+            return False
+        else:
+            return True
     
-    def move(self, event: MoveToChamberEvent):
-        self.history.add_event(event)
+    def move(self, event: MoveToChamberEvent): 
         chamber = event.chamber
+        self.history.add_event(event)
         print(f"activeNpcs 2 {self.activeNpcs}")
         self.currentCoords = chamber.coordinates
         probability_empty = 1
@@ -164,9 +216,23 @@ class GameState:
             chamber.monster = self.add_monster()
         else:
             if len(self.npcs) > len(self.activeNpcs):
-                self.addNpc()    
-        return chamber
-    
+                self.addNpc()  
+
+    def attack(self):
+        """attacks monster if present"""
+        chamber = self.dungeon.chambers[self.currentCoords]
+        if not chamber.monster:
+            self.history.add_event(NoTargetAttackEvent())
+            return
+        monster = chamber.monster
+        monster.current_health -= self.myself.strength
+        if monster.current_health <= 0:
+            self.history.add_event(MonsterKilledEvent(monster))
+            chamber.monster = None
+            return
+        self.history.add_event(AttackEvent(self.myself, monster, self.myself.strength))
+
+        
     def addNpc(self):
         for current_npc in self.npcs:
             if current_npc.name() in self.activeNpcs:
@@ -189,8 +255,8 @@ class GameState:
 
         return monster
     
-    def modify_stat(self, stat: int):
-        return randint(0.8 * stat, 1.2 * stat)
+    def modify_stat(self,stat: int):
+        return randint(int(0.8* stat), int(1.2 * stat))
 
     def createMap(self, center, margin):
         result = []

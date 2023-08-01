@@ -52,4 +52,6 @@ def runCommand(command):
         dungeon.gameState.moveUp()
     if command == "south" or command == "s":
         dungeon.gameState.moveDown()
+    if command == "attack" or command == "a":
+        dungeon.gameState.attack()
     return redirect(f"/game")
