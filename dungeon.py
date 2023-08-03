@@ -98,30 +98,57 @@ class MonsterBlockEvent(events.Event):
 
     def description(self):
         return ["The monster blocks your path!", "It doesnt look you can leave without defeating the monster."]
-    
+
+
 class NoTargetAttackEvent(events.Event):
     """Event for when you attack with no target"""
 
     def description(self):
         return ["You attacked the air! You did 0 dmg D:"]
-    
+
+
 class AttackEvent(events.Event):
-    """Event for when you attack a monster"""
+    """Event for when a character attacks another character"""
+
     def __init__(self, attacker: characters.Character, target: characters.Character, dmg_taken: int):
         self.attacker = attacker
         self.target = target
         self.dmg_taken = dmg_taken
-        
-    def description (self):
+
+    def description(self):
         return [f"{self.attacker.name()} swung and hit {self.target.name()} for {self.dmg_taken} damage!"]
 
+
 class MonsterKilledEvent(events.Event):
-    "Event for when monster is killed (0 HP)"
+    """Event for when monster is killed (0 HP)"""
+
     def __init__(self, monster: characters.Monster):
         self.monster = monster
 
     def description(self):
         return [f"{self.monster.name()} was defeated!"]
+
+
+class NPCKilledEvent(events.Event):
+    """Event for when NPC is killed"""
+
+    def __init__(self, killed_npc: npc.NPC):
+        self.killed_npc = killed_npc
+
+    def description(self):
+        return [f"{self.killed_npc.name()} was defeated!"]
+
+
+class HealingEvent(events.Event):
+    """Event for when a character is healed"""
+
+    def __init__(self, healer: characters.Character, target: characters.Character, heal_amount: int):
+        self.healer = healer
+        self.target = target
+        self.heal_amount = heal_amount
+
+    def description(self):
+        return [f"{self.healer.name()} healed {self.target.name()} for {self.heal_amount} health!"]
 
 
 class Dungeon:
@@ -167,7 +194,7 @@ class GameState:
         self.npcs = [npc.Warrior(4, 15), npc.Alchemist(2, 7)]
         self.activeNpcs = {}
         self.monsters = [characters.Monster(
-            5, 5, "Goblin", "pink-monster"), characters.Monster(3, 20, "Troll", "green-monster")]
+            5, 5, "Goblin", "pink-monster"), characters.Monster(3, 10, "Troll", "green-monster")]
         self.history = events.History()
         self.myself = Player(3, 10)
 
@@ -199,8 +226,8 @@ class GameState:
             return False
         else:
             return True
-    
-    def move(self, event: MoveToChamberEvent): 
+
+    def move(self, event: MoveToChamberEvent):
         chamber = event.chamber
         self.history.add_event(event)
         print(f"activeNpcs 2 {self.activeNpcs}")
@@ -216,7 +243,7 @@ class GameState:
             chamber.monster = self.add_monster()
         else:
             if len(self.npcs) > len(self.activeNpcs):
-                self.addNpc()  
+                self.addNpc()
 
     def attack(self):
         """attacks monster if present"""
@@ -225,14 +252,70 @@ class GameState:
             self.history.add_event(NoTargetAttackEvent())
             return
         monster = chamber.monster
-        monster.current_health -= self.myself.strength
+        if not self.attack_monster(self.myself, monster, chamber):
+            return
+        print("monster alive after hero attacks")
+        self.monster_attack(monster)
+        for attacker_npc in self.activeNpcs.values():
+            if attacker_npc.can_heal():
+                if self.heal(attacker_npc):
+                    continue
+            if attacker_npc.can_attack():
+                print(f"{attacker_npc.name()} attacks monster")
+                if not self.attack_monster(attacker_npc, monster, chamber):
+                    return
+
+    def attack_monster(self, attacker: characters.Character, monster: characters.Monster, chamber: Chamber) -> bool:
+        """Function for any character (player or NPC) to attack monster"""
+        monster.current_health -= attacker.strength
+        self.history.add_event(AttackEvent(
+            attacker, monster, attacker.strength))
         if monster.current_health <= 0:
             self.history.add_event(MonsterKilledEvent(monster))
             chamber.monster = None
-            return
-        self.history.add_event(AttackEvent(self.myself, monster, self.myself.strength))
+            return False
+        return True
 
-        
+    def attack_character(self, attacker: characters.Character, target: characters.Character) -> bool:
+        """General function for character attacking other character"""
+        target.current_health -= attacker.strength
+        self.history.add_event(AttackEvent(
+            attacker, target, attacker.strength))
+        return target.current_health > 0
+
+    def monster_attack(self, monster: characters.Monster):
+        """Function for monster's attack, first randomly picks target and then attacks them"""
+        x = randint(0, len(self.activeNpcs))
+        if x < len(self.activeNpcs):
+            target = list(self.activeNpcs.values())[x]
+            npc_survived = self.attack_character(monster, target)
+            if not npc_survived:
+                self.history.add_event(NPCKilledEvent(target))
+                del self.activeNpcs[target.name()]
+        else:
+            hero_survived = self.attack_character(monster, self.myself)
+            if not hero_survived:
+                self.myself = None
+
+    def heal(self, healer: npc.NPC) -> bool:
+        """Method for healing the hero or other NPCS if they are not at full health, returns True if healer heals someone"""
+        if self.myself.current_health < self.myself.health:
+            old_health = self.myself.current_health
+            self.myself.current_health = min(
+                self.myself.health, self.myself.current_health + healer.strength)
+            self.history.add_event(HealingEvent(healer, self.myself,
+                                                self.myself.current_health - old_health))
+            return True
+        for helped_npc in self.activeNpcs.values():
+            if helped_npc.current_health < helped_npc.health:
+                old_health = helped_npc.current_health
+                helped_npc.current_health = min(helped_npc.health,
+                                                helped_npc.current_health + healer.strength)
+                self.history.add_event(HealingEvent(healer, helped_npc,
+                                                    helped_npc.current_health - old_health))
+                return True
+        return False
+
     def addNpc(self):
         for current_npc in self.npcs:
             if current_npc.name() in self.activeNpcs:
@@ -242,21 +325,21 @@ class GameState:
             break
         print(f"activeNpcs {self.activeNpcs}")
         return "hi"
-    
+
     def add_monster(self):
         prototype = self.monsters[randint(0, len(self.monsters) - 1)]
         print(prototype.name())
         print(prototype.image_name)
-        monster = characters.Monster(self.modify_stat(prototype.strength), 
+        monster = characters.Monster(self.modify_stat(prototype.strength),
                                      self.modify_stat(prototype.health),
                                      prototype.name(), prototype.image_name)
         print(f"Created monster: {monster}")
         self.history.add_event(MeetMonsterEvent(monster))
 
         return monster
-    
-    def modify_stat(self,stat: int):
-        return randint(int(0.8* stat), int(1.2 * stat))
+
+    def modify_stat(self, stat: int):
+        return randint(int(0.8 * stat), int(1.2 * stat))
 
     def createMap(self, center, margin):
         result = []
@@ -282,7 +365,6 @@ class GameState:
                     mapString += "  x "
             mapString += "\n"
         return mapString
-    
-    
+
 
 gameState = None

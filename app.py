@@ -31,6 +31,10 @@ def game():
 
     if not dungeon.gameState:
         return redirect("/")
+    
+    if not dungeon.gameState.myself:
+        return redirect("/gameover")
+    
     chamber = dungeon.gameState.dungeon.chambers[dungeon.gameState.currentCoords]
     number = chamber.number
     mapString = dungeon.gameState.createMapString(dungeon.gameState.currentCoords, 2)
@@ -41,6 +45,10 @@ def game():
                            number=number,
                            myself=dungeon.gameState.myself,
                            history = dungeon.gameState.history)
+
+@app.route("/gameover")
+def gameover():
+    return render_template("gameover.html")
 
 def runCommand(command):
     command = command.lower()
