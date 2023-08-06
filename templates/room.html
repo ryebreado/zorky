@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+<h1>{% block title %}Game{% endblock %}</h1>
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div id="game">
+    <div id="left">
+        <div id="room">
+            
+        </div>
+        <div id="history">
+            {% for event in history.most_recent_events(5) %}
+            <div class="row">
+                {% for line in event.description() %}
+                {{ line }}
+                </br>
+                {% endfor %}
+            </div>
+            <div class="row">
+                &nbsp;
+            </div>
+            {%endfor%}
+        </div>
+        <div id="commands">
+            Enter command:
+            <form action="/game" method="POST">
+                <p><input type='text' name='cm' /></p>
+                <p><input type='submit' value='Submit' /></p>
+            </form>
+
+        </div>
+    </div>
+    <div id="right">
+        <div id="map">
+            <pre>{{ mapString }}</pre>
+        </div>
+        <div id="stats">
+            <div id="playerstats">
+                {{ myself }}
+            </div>
+            {% if chamber.monster %}
+            <div id="monsterstats">
+                {{ chamber.monster }}
+            </div>
+            {% endif %}
+            {% if activeNpcs %}
+            {% for name in activeNpcs %}
+            <div class="npcstats">
+
+                {{ activeNpcs[name] }}
+
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -8,7 +8,7 @@ app = Flask(__name__)
 def home():
     name = request.cookies.get("userName")
     dungeon.gameState = dungeon.GameState()
-    return render_template("index.html", 
+    return render_template("home.html", 
                            title="Hello", 
                            name=name)
 
@@ -38,7 +38,7 @@ def game():
     chamber = dungeon.gameState.dungeon.chambers[dungeon.gameState.currentCoords]
     number = chamber.number
     mapString = dungeon.gameState.createMapString(dungeon.gameState.currentCoords, 2)
-    return render_template("chamber.html", 
+    return render_template("room.html", 
                            activeNpcs = dungeon.gameState.activeNpcs,
                            mapString = mapString,
                            chamber=chamber,

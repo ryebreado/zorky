@@ -1,0 +1,71 @@
+body {
+    background-color: black;
+    color: white;
+    font: 1.3rem Inconsolata, monospace;
+    text-shadow: 0 0 5px #C8C8C8;
+    text-align: center;
+}
+
+nav {
+    background: lightgray;
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+}
+
+nav h1 {
+    flex: auto;
+    margin: 0;
+}
+
+nav h1 a {
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li a,
+nav ul li span,
+header .action {
+    display: block;
+    padding: 0.5rem;
+}
+
+::selection {
+    background: #0080FF;
+    text-shadow: none;
+}
+
+#gameover {
+    font-size: 15vw;
+}
+
+#game {
+    display: flex;
+    flex-direction: row;
+
+}
+
+#left {
+    display: flex;
+    flex-direction: column;
+    background-color: bisque;
+}
+
+#right {
+    display: flex;
+    flex-direction: column;
+    background-color: aqua;
+}
+
+#stats {
+    display: flex;
+    flex-direction: column;
+    background-color: darksalmon;
+}
