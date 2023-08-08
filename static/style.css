@@ -1,9 +1,8 @@
 body {
     background-color: black;
-    color: white;
+    color: #71ec44;
     font: 1.3rem Inconsolata, monospace;
     text-shadow: 0 0 5px #C8C8C8;
-    text-align: center;
 }
 
 nav {
@@ -49,23 +48,47 @@ header .action {
 #game {
     display: flex;
     flex-direction: row;
-
 }
 
 #left {
     display: flex;
     flex-direction: column;
-    background-color: bisque;
+    background-color: black;
+    width: 70%;
+}
+
+#room {
+    display: flex;
+    width: 100%;
+    background-size: 100%;
+    height: 400px;
+    background-color: #333333;
+}
+
+.characters img {
+    height: 90%;
+}
+
+#history {
+    height: 300px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
 }
 
 #right {
     display: flex;
     flex-direction: column;
-    background-color: aqua;
+    background-color: #666;
+    width: 30%;
 }
 
 #stats {
     display: flex;
     flex-direction: column;
-    background-color: darksalmon;
+}
+
+.stats-element {
+    background-color: #000000;
+    margin-top: 10px;
 }

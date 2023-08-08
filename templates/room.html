@@ -7,10 +7,21 @@
 <div id="game">
     <div id="left">
         <div id="room">
-            
+            {% if activeNpcs %}
+            {% for name in activeNpcs %}
+            <div class="characters">
+                <img src="{{ url_for('static', filename=name + '.png') }}" alt="{{ name }}"/>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% if chamber.monster %}
+            <div class="characters">
+                <img src="{{ url_for('static', filename=chamber.monster.image_name + '.png') }}" alt="{{ chamber.monster.name() }}"/>
+            </div>
+            {% endif %}
         </div>
         <div id="history">
-            {% for event in history.most_recent_events(5) %}
+            {% for event in history.most_recent_events(10)|reverse %}
             <div class="row">
                 {% for line in event.description() %}
                 {{ line }}
@@ -36,19 +47,25 @@
             <pre>{{ mapString }}</pre>
         </div>
         <div id="stats">
-            <div id="playerstats">
-                {{ myself }}
+            <div id="playerstats" class="stats-element">
+                {{ myself.name()|upper }} <br/>
+                Strength: {{ myself.strength}} <br/>
+                Health: {{ myself.current_health }} / {{ myself.health }}
             </div>
             {% if chamber.monster %}
-            <div id="monsterstats">
-                {{ chamber.monster }}
+            <div id="monsterstats" class="stats-element">
+                {{ chamber.monster.name()|upper }} <br/>
+                Strength: {{ chamber.monster.strength }} <br/>
+                Health: {{ chamber.monster.current_health }} / {{ chamber.monster.health }}
             </div>
             {% endif %}
             {% if activeNpcs %}
             {% for name in activeNpcs %}
-            <div class="npcstats">
+            <div class="npcstats stats-element">
 
-                {{ activeNpcs[name] }}
+                {{ activeNpcs[name].name()|upper }} <br/>
+                Strength: {{ activeNpcs[name].strength}} <br/>
+                Health: {{ activeNpcs[name].current_health }} / {{ activeNpcs[name].health }}
 
             </div>
             {% endfor %}
