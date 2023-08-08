@@ -1,29 +1,30 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Home{% endblock %}</h1>
+<h1 class="home">{% block title %}Welcome to the world of ZORKY!{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
-<div>
-    <a href="/game" class="btn btn-primary">Begin!</a>
-      
+<div class="home">
+  <a href="/game" class="button">Begin!</a>
+  <div class="name-card">
     {% if name: %}
-      <div>
-        Hi, {{name}}!
-      </div>
-      <p>
-        <h3>Change name</h3>
-      </p>
+    <div>
+      Hi, {{name}}!
+    </div>
+    <p>
+    <h3>Change name</h3>
+    </p>
     {% else %}
-      <p>
-      <h3>Enter name</h3>
-      </p>
+    <p>
+    <h3>Enter name</h3>
+    </p>
     {% endif %}
     <form action="/setname" method="POST">
-      
+
       <p><input type='text' name='nm' /></p>
       <p><input type='submit' value='Submit' /></p>
     </form>
+  </div>
 </div>
 {% endblock %}

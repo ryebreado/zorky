@@ -5,6 +5,22 @@ body {
     text-shadow: 0 0 5px #C8C8C8;
 }
 
+a:visited {
+    color: default;
+}
+
+a {
+    text-decoration: none;
+}
+
+.button {
+    background-color: #31661e;
+    color: white;
+    font-size: 2rem;
+    padding: 5px;
+    margin: 10px;
+}
+
 nav {
     background: lightgray;
     display: flex;
@@ -91,4 +107,18 @@ header .action {
 .stats-element {
     background-color: #000000;
     margin-top: 10px;
+}
+
+.home {
+    text-align: center;
+}
+
+.name-card {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    width: 300px;
+    padding:10px;
+    background-color: #333333;
 }
