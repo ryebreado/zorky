@@ -1,10 +1,17 @@
-# GitHub Codespaces ♥️ Flask
+# Zorky
 
-Welcome to your shiny new Codespace running Flask! We've got everything fired up and running for you to explore Flask.
+Zorky was created during the summer of 2023 as a summer project to help us learn Python, CSS, and HTML. 
 
-You've got a blank canvas to work on from a git perspective as well. There's a single initial commit with the what you're seeing right now - where you go from here is up to you!
+The original plan was to create a game similar to [Zork](https://en.wikipedia.org/wiki/Zork), with the ability to type in commands, and fight monsters. It eventually evolved to become something more inspired off of DND and turn based games.
 
-Everything you do here is contained within this one codespace. There is no repository on GitHub yet. If and when you’re ready you can click "Publish Branch" and we’ll create your repository and push up your project. If you were just exploring then and have no further need for this code then you can simply delete your codespace and it's gone forever.
+## What We Learned
+
+* **Python** - We learned basic data structures such as lists and dictionaries. We also used classes with inheritence.
+* **HTML** and **CSS** - We learned the basics of HTML and CSS, as well as how to combine the two skills to create an asthetic webpage. We used mainly flexboxes to structure our webpage. 
+* **Flask** - We used the flask webserver framework, incuding Jinja templates to generate HTML. 
+* **HTTP** - learned basics of HTTP. Our server uses POST and GET, as well as using cookies to store data such as username. 
+
+## Developer Instructions
 
 To run this application:
 
