@@ -154,12 +154,12 @@ class HealingEvent(events.Event):
 class Dungeon:
     def __init__(self):
         self.chambers = {}
-        Dungeon.lastNumber = 0
+        # Dungeon.lastNumber = 0
         self.createChamber(Coordinates(0, 0))
 
     def createChamber(self, coordinates):
-        Dungeon.lastNumber += 1
-        chamber = Chamber(coordinates, Dungeon.lastNumber)
+        # Dungeon.lastNumber += 1
+        chamber = Chamber(coordinates, len(self.chambers) + 1)
         self.chambers[coordinates] = chamber
         return chamber
 
