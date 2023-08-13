@@ -18,3 +18,9 @@ To run this application:
 ```
 flask --debug run
 ```
+
+Before you run the server for the first time, you have to create the database by running
+
+```
+python init_db.py
+```

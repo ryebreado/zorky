@@ -8,11 +8,16 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    conn = get_db_connection()
-    posts = conn.execute('SELECT * FROM gamestate').fetchall()
-    conn.close()
-    for post in posts:
-        print(f"user: {post['username']}, content: {post['content']}")
+    try:
+        conn = get_db_connection()
+        posts = conn.execute('SELECT * FROM gamestate').fetchall()
+        conn.close()
+        for post in posts:
+            print(f"user: {post['username']}, content: {post['content']}")
+    except sqlite3.OperationalError as error:
+        print(f"Database does not exist. {error}")
+        return f"Database does not exist. Error message: {error}"
+
     name = request.cookies.get("userName")
     dungeon.gameState = dungeon.GameState()
     return render_template("home.html",
